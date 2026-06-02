@@ -22,8 +22,41 @@ import {
   UnauthorizedError,
   ForbiddenError,
 } from "../middlewares/error.middleware";
+import { ENV } from "../config/env";
 
 const userRepository = new UserRepository();
+
+// ── Helper: send email or log OTP in development ──────
+const sendEmail = async (
+  type: "verification" | "reset" | "resend",
+  email: string,
+  firstName: string,
+  otp: string
+): Promise<void> => {
+  if (ENV.NODE_ENV === "production") {
+    if (type === "verification" || type === "resend") {
+      await emailService.sendVerificationEmail(
+        email,
+        firstName,
+        otp
+      );
+    } else if (type === "reset") {
+      await emailService.sendPasswordResetEmail(
+        email,
+        firstName,
+        otp
+      );
+    }
+  } else {
+    // Development — print OTP to terminal
+    console.log("\n──────────────────────────────────────");
+    console.log(`📧  To    : ${email}`);
+    console.log(`👤  Name  : ${firstName}`);
+    console.log(`🔑  OTP   : ${otp}`);
+    console.log(`⏱️   Expires in 10 minutes`);
+    console.log("──────────────────────────────────────\n");
+  }
+};
 
 class AuthService {
 
@@ -37,12 +70,15 @@ class AuthService {
       nationality,
     } = input;
 
+    // Default to tourist if no role given
     const role = (input.role as UserRole) || UserRole.TOURIST;
 
+    // Block admin registration via API
     if (role === UserRole.ADMIN) {
       throw new BadRequestError("Invalid role");
     }
 
+    // Only these roles allowed
     const allowed = [
       UserRole.TOURIST,
       UserRole.GUIDE,
@@ -52,19 +88,25 @@ class AuthService {
       throw new BadRequestError("Invalid role selected");
     }
 
+    // Check duplicate email
     const existing = await userRepository.findByEmail(email);
     if (existing) {
       throw new ConflictError("Email is already registered");
     }
 
+    // Hash password
     const hashed = await hashPassword(password);
+
+    // Generate OTP
     const { otp, otpExpires } = generateOtp();
 
+    // Tourist = auto approved, guide/operator = pending
     const accountStatus =
       role === UserRole.TOURIST
         ? AccountStatus.APPROVED
         : AccountStatus.PENDING;
 
+    // Create user
     await userRepository.create({
       firstName,
       lastName,
@@ -79,11 +121,8 @@ class AuthService {
       otpExpires,
     });
 
-    await emailService.sendVerificationEmail(
-      email,
-      firstName,
-      otp
-    );
+    // Send OTP email or print to terminal in dev
+    await sendEmail("verification", email, firstName, otp);
 
     const message =
       role === UserRole.TOURIST
@@ -114,13 +153,14 @@ class AuthService {
       );
     }
 
-    // ✅ use .toString() not as string
+    // Mark verified and clear OTP
     await userRepository.update(user._id.toString(), {
       isVerified: true,
       otp: undefined,
       otpExpires: undefined,
     });
 
+    // Guide/Operator needs admin approval — no token yet
     if (
       user.role === UserRole.GUIDE ||
       user.role === UserRole.OPERATOR
@@ -143,7 +183,7 @@ class AuthService {
       };
     }
 
-    // ✅ use .toString() not as string
+    // Tourist — issue tokens immediately
     const accessToken = generateAccessToken({
       id: user._id.toString(),
       role: user.role,
@@ -224,7 +264,6 @@ class AuthService {
       );
     }
 
-    // ✅ use .toString() not as string
     const accessToken = generateAccessToken({
       id: user._id.toString(),
       role: user.role,
@@ -260,6 +299,7 @@ class AuthService {
     const user = await userRepository.findByEmail(input.email);
 
     if (!user) {
+      // Never reveal if email exists
       return {
         message:
           "If this email exists, a reset OTP has been sent.",
@@ -268,7 +308,10 @@ class AuthService {
 
     const { otp, otpExpires } = generateOtp();
     await userRepository.saveOtp(input.email, otp, otpExpires);
-    await emailService.sendPasswordResetEmail(
+
+    // Send reset email or print to terminal in dev
+    await sendEmail(
+      "reset",
       input.email,
       user.firstName,
       otp
@@ -296,7 +339,6 @@ class AuthService {
 
     const hashed = await hashPassword(newPassword);
 
-    // ✅ use .toString() not as string
     await userRepository.update(user._id.toString(), {
       password: hashed,
       otp: undefined,
@@ -317,11 +359,9 @@ class AuthService {
 
     const { otp, otpExpires } = generateOtp();
     await userRepository.saveOtp(email, otp, otpExpires);
-    await emailService.sendVerificationEmail(
-      email,
-      user.firstName,
-      otp
-    );
+
+    // Send OTP email or print to terminal in dev
+    await sendEmail("resend", email, user.firstName, otp);
 
     return { message: "New OTP sent to your email." };
   }
