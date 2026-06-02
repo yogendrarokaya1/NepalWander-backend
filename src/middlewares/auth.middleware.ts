@@ -6,7 +6,9 @@ import {
   ForbiddenError,
 } from "./error.middleware";
 import asyncHandler from "../utils/asyncHandler";
+import { UserModel } from "../models/User.model";
 
+// Must be logged in
 export const protect = asyncHandler(
   async (req: AuthRequest, _res: Response, next: NextFunction) => {
     const authHeader = req.headers.authorization;
@@ -22,12 +24,39 @@ export const protect = asyncHandler(
   }
 );
 
+// Restrict to specific roles
 export const restrictTo = (...roles: UserRole[]) =>
   asyncHandler(
     async (req: AuthRequest, _res: Response, next: NextFunction) => {
       if (!req.user || !roles.includes(req.user.role)) {
-        throw new ForbiddenError("You do not have permission");
+        throw new ForbiddenError(
+          "You do not have permission to perform this action"
+        );
       }
       next();
     }
   );
+
+// Only super admin can access
+export const isSuperAdmin = asyncHandler(
+  async (req: AuthRequest, _res: Response, next: NextFunction) => {
+    if (!req.user) {
+      throw new UnauthorizedError("No token provided");
+    }
+
+    // Must be admin role first
+    if (req.user.role !== UserRole.ADMIN) {
+      throw new ForbiddenError("Access denied");
+    }
+
+    // Check isSuperAdmin in database
+    const user = await UserModel.findById(req.user.id);
+    if (!user || !user.isSuperAdmin) {
+      throw new ForbiddenError(
+        "Only Super Admin can perform this action"
+      );
+    }
+
+    next();
+  }
+);

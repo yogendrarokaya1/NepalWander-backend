@@ -1,5 +1,6 @@
 import { UserModel, UserDocument } from "../models/User.model";
-import { IUser } from "../types";
+import { IUser, UserRole, AccountStatus } from "../types";
+import mongoose from "mongoose";
 
 export class UserRepository {
 
@@ -8,6 +9,7 @@ export class UserRepository {
   }
 
   async findById(id: string): Promise<UserDocument | null> {
+    if (!mongoose.Types.ObjectId.isValid(id)) return null;
     return UserModel.findById(id);
   }
 
@@ -35,7 +37,12 @@ export class UserRepository {
     id: string,
     data: Partial<IUser>
   ): Promise<UserDocument | null> {
-    return UserModel.findByIdAndUpdate(id, data, { new: true });
+    if (!mongoose.Types.ObjectId.isValid(id)) return null;
+    return UserModel.findByIdAndUpdate(
+      id,
+      { $set: data },
+      { new: true }
+    );
   }
 
   async saveOtp(
@@ -45,7 +52,7 @@ export class UserRepository {
   ): Promise<void> {
     await UserModel.findOneAndUpdate(
       { email },
-      { otp, otpExpires }
+      { $set: { otp, otpExpires } }
     );
   }
 
@@ -53,20 +60,39 @@ export class UserRepository {
     id: string,
     token: string
   ): Promise<void> {
-    await UserModel.findByIdAndUpdate(id, { refreshToken: token });
+    await UserModel.findByIdAndUpdate(
+      id,
+      { $set: { refreshToken: token } }
+    );
   }
 
   async clearRefreshToken(id: string): Promise<void> {
-    await UserModel.findByIdAndUpdate(id, {
-      refreshToken: undefined,
-    });
+    await UserModel.findByIdAndUpdate(
+      id,
+      { $unset: { refreshToken: 1 } }
+    );
   }
 
   async findAll(): Promise<UserDocument[]> {
     return UserModel.find().sort({ createdAt: -1 });
   }
 
+  // ← new methods below
+
+  async findByRole(role: UserRole): Promise<UserDocument[]> {
+    return UserModel.find({ role }).sort({ createdAt: -1 });
+  }
+
+  async findByStatus(
+    status: AccountStatus
+  ): Promise<UserDocument[]> {
+    return UserModel.find({
+      accountStatus: status,
+    }).sort({ createdAt: -1 });
+  }
+
   async delete(id: string): Promise<boolean> {
+    if (!mongoose.Types.ObjectId.isValid(id)) return false;
     const result = await UserModel.findByIdAndDelete(id);
     return !!result;
   }

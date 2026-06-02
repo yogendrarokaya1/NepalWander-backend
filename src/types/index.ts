@@ -21,6 +21,7 @@ export interface IUser {
   password: string;
   role: UserRole;
   accountStatus: AccountStatus;
+  isSuperAdmin?: boolean;     
   nationality?: string;
   phone?: string;
   profileImage?: string;

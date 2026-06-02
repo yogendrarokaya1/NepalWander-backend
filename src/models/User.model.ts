@@ -33,6 +33,10 @@ const UserSchema = new Schema<UserDocument>(
       enum: Object.values(UserRole),
       default: UserRole.TOURIST,
     },
+    isSuperAdmin: {
+      type: Boolean,
+      default: false,           
+    },
     accountStatus: {
       type: String,
       enum: Object.values(AccountStatus),
