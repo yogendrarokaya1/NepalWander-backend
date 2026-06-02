@@ -1,6 +1,4 @@
 import { Request, Response, NextFunction } from "express";
-
-// Custom error classes
 export class AppError extends Error {
   statusCode: number;
   constructor(message: string, statusCode: number) {
@@ -9,6 +7,7 @@ export class AppError extends Error {
     Error.captureStackTrace(this, this.constructor);
   }
 }
+
 export class BadRequestError extends AppError {
   constructor(msg = "Bad Request") { super(msg, 400); }
 }
@@ -25,14 +24,14 @@ export class ConflictError extends AppError {
   constructor(msg = "Conflict") { super(msg, 409); }
 }
 
-// Global error handler
+// ── Global error handler ──────────────────────────────
 export const errorHandler = (
   err: Error,
   _req: Request,
   res: Response,
   _next: NextFunction
 ): void => {
-  // Known operational error
+  // Known app error
   if (err instanceof AppError) {
     res.status(err.statusCode).json({
       success: false,
@@ -43,7 +42,7 @@ export const errorHandler = (
 
   // Mongoose duplicate key
   if ((err as any).code === 11000) {
-    const field = Object.keys((err as any).keyValue)[0];
+    const field = Object.keys((err as any).keyValue || {})[0];
     res.status(409).json({
       success: false,
       message: `${field} is already in use`,
@@ -51,7 +50,7 @@ export const errorHandler = (
     return;
   }
 
-  // Mongoose validation error
+  // Mongoose validation
   if (err.name === "ValidationError") {
     const messages = Object.values((err as any).errors)
       .map((e: any) => e.message)
@@ -66,11 +65,11 @@ export const errorHandler = (
     return;
   }
   if (err.name === "TokenExpiredError") {
-    res.status(401).json({ success: false, message: "Token has expired" });
+    res.status(401).json({ success: false, message: "Token expired" });
     return;
   }
 
-  // Unknown error
+  // Unknown
   console.error("Unhandled Error:", err);
   res.status(500).json({
     success: false,
@@ -78,10 +77,10 @@ export const errorHandler = (
   });
 };
 
-// 404 handler
+// ── 404 handler ───────────────────────────────────────
 export const notFound = (req: Request, res: Response): void => {
   res.status(404).json({
     success: false,
-    message: `Route ${req.originalUrl} does not exist`,
+    message: `Route ${req.originalUrl} not found`,
   });
 };

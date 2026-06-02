@@ -1,19 +1,12 @@
 import { Response } from "express";
 
-interface ApiResponseData {
-  success: boolean;
-  message: string;
-  data?: unknown;
-  errors?: unknown;
-}
-
 export class ApiResponse {
   static success(
     res: Response,
     message: string,
     data?: unknown,
     statusCode = 200
-  ): Response<ApiResponseData> {
+  ): Response {
     return res.status(statusCode).json({
       success: true,
       message,
@@ -25,7 +18,7 @@ export class ApiResponse {
     res: Response,
     message: string,
     data?: unknown
-  ): Response<ApiResponseData> {
+  ): Response {
     return res.status(201).json({
       success: true,
       message,
@@ -38,7 +31,7 @@ export class ApiResponse {
     message: string,
     statusCode = 500,
     errors?: unknown
-  ): Response<ApiResponseData> {
+  ): Response {
     return res.status(statusCode).json({
       success: false,
       message,

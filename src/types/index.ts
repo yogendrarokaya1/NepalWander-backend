@@ -7,13 +7,20 @@ export enum UserRole {
   ADMIN = "admin",
 }
 
+export enum AccountStatus {
+  PENDING = "pending",
+  APPROVED = "approved",
+  REJECTED = "rejected",
+  SUSPENDED = "suspended",
+}
+
 export interface IUser {
-  _id?: string;
   firstName: string;
   lastName: string;
   email: string;
   password: string;
   role: UserRole;
+  accountStatus: AccountStatus;
   nationality?: string;
   phone?: string;
   profileImage?: string;
@@ -43,7 +50,7 @@ export interface RegisterInput {
   lastName: string;
   email: string;
   password: string;
-  role: string;
+  role?: string;
   nationality?: string;
 }
 
