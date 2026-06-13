@@ -1,21 +1,20 @@
 import { Request, Response, NextFunction } from "express";
-import { validationResult } from "express-validator";
+import { ZodSchema, ZodError } from "zod";
 import { BadRequestError } from "./error.middleware";
 
-const validate = (
-  req: Request,
-  _res: Response,
-  next: NextFunction
-): void => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    const message = errors
-      .array()
-      .map((e) => e.msg)
-      .join(", ");
-    throw new BadRequestError(message);
-  }
-  next();
-};
+const validate =
+  (schema: ZodSchema) =>
+  (req: Request, _res: Response, next: NextFunction): void => {
+    try {
+      req.body = schema.parse(req.body);
+      next();
+    } catch (err) {
+      if (err instanceof ZodError) {
+        const message = err.issues.map((e) => e.message).join(", ");
+        throw new BadRequestError(message);
+      }
+      throw err;
+    }
+  };
 
 export default validate;

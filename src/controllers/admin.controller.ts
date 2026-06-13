@@ -6,7 +6,7 @@ import { AuthRequest } from "../types";
 
 class AdminController {
 
-  // POST /api/v1/admin/create-admin
+
   createAdmin = asyncHandler(
     async (req: AuthRequest, res: Response) => {
       const result = await adminService.createAdmin(req.body);
@@ -14,7 +14,7 @@ class AdminController {
     }
   );
 
-  // GET /api/v1/admin/admins
+
   getAllAdmins = asyncHandler(
     async (_req: AuthRequest, res: Response) => {
       const admins = await adminService.getAllAdmins();
@@ -22,7 +22,7 @@ class AdminController {
     }
   );
 
-  // DELETE /api/v1/admin/admins/:id
+
   deleteAdmin = asyncHandler(
     async (req: AuthRequest, res: Response) => {
       const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
@@ -34,7 +34,7 @@ class AdminController {
     }
   );
 
-  // PATCH /api/v1/admin/admins/:id/toggle-status
+
   toggleAdminStatus = asyncHandler(
     async (req: AuthRequest, res: Response) => {
       const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
@@ -46,7 +46,7 @@ class AdminController {
     }
   );
 
-  // PATCH /api/v1/admin/accounts/:id/approve
+ 
   approveAccount = asyncHandler(
     async (req: AuthRequest, res: Response) => {
       const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
@@ -57,7 +57,7 @@ class AdminController {
     }
   );
 
-  // PATCH /api/v1/admin/accounts/:id/reject
+ 
   rejectAccount = asyncHandler(
     async (req: AuthRequest, res: Response) => {
       const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
@@ -69,7 +69,7 @@ class AdminController {
     }
   );
 
-  // GET /api/v1/admin/users
+  
   getAllUsers = asyncHandler(
     async (_req: AuthRequest, res: Response) => {
       const users = await adminService.getAllUsers();
@@ -77,7 +77,7 @@ class AdminController {
     }
   );
 
-  // GET /api/v1/admin/pending
+
   getPendingAccounts = asyncHandler(
     async (_req: AuthRequest, res: Response) => {
       const accounts = await adminService.getPendingAccounts();

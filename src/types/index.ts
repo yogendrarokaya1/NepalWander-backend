@@ -21,7 +21,7 @@ export interface IUser {
   password: string;
   role: UserRole;
   accountStatus: AccountStatus;
-  isSuperAdmin?: boolean;     
+  isSuperAdmin?: boolean;
   nationality?: string;
   phone?: string;
   profileImage?: string;
@@ -46,31 +46,11 @@ export interface JwtPayload {
   role: UserRole;
 }
 
-export interface RegisterInput {
-  firstName: string;
-  lastName: string;
-  email: string;
-  password: string;
-  role?: string;
-  nationality?: string;
-}
-
-export interface LoginInput {
-  email: string;
-  password: string;
-}
-
-export interface VerifyOtpInput {
-  email: string;
-  otp: string;
-}
-
-export interface ForgotPasswordInput {
-  email: string;
-}
-
-export interface ResetPasswordInput {
-  email: string;
-  otp: string;
-  newPassword: string;
-}
+// Input types now come from Zod schemas
+export type {
+  RegisterInput,
+  LoginInput,
+  VerifyOtpInput,
+  ForgotPasswordInput,
+  ResetPasswordInput,
+} from "../validators/auth.validator";

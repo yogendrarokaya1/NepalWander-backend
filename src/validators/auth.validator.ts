@@ -1,92 +1,106 @@
-import { body } from "express-validator";
+import { z } from "zod";
 
-export const registerValidator = [
-  body("firstName")
-    .trim()
-    .notEmpty().withMessage("First name is required")
-    .isLength({ min: 2 })
-    .withMessage("First name must be at least 2 characters"),
+export const registerSchema = z.object({
+  firstName: z
+    .string()
+    .min(2, "First name must be at least 2 characters")
+    .trim(),
 
-  body("lastName")
-    .trim()
-    .notEmpty().withMessage("Last name is required")
-    .isLength({ min: 2 })
-    .withMessage("Last name must be at least 2 characters"),
+  lastName: z
+    .string()
+    .min(2, "Last name must be at least 2 characters")
+    .trim(),
 
-  body("email")
-    .trim()
-    .notEmpty().withMessage("Email is required")
-    .isEmail().withMessage("Please provide a valid email")
-    .normalizeEmail(),
+  email: z
+    .string()
+    .email("Please provide a valid email address")
+    .toLowerCase()
+    .trim(),
 
-  body("password")
-    .notEmpty().withMessage("Password is required")
-    .isLength({ min: 8 })
-    .withMessage("Password must be at least 8 characters")
-    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/)
-    .withMessage(
+  password: z
+    .string()
+    .min(8, "Password must be at least 8 characters")
+    .regex(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
       "Password must have uppercase, lowercase and a number"
     ),
 
-  body("role")
-    .optional()
-    .isIn(["tourist", "guide", "operator"])
-    .withMessage("Role must be tourist, guide or operator"),
+  role: z
+    .enum(["tourist", "guide", "operator"])
+    .default("tourist"),
 
-  body("nationality")
-    .optional()
+  nationality: z
+    .string()
+    .min(2, "Nationality must be valid")
     .trim()
-    .isLength({ min: 2 })
-    .withMessage("Nationality must be valid"),
-];
+    .optional(),
+});
 
-export const loginValidator = [
-  body("email")
-    .trim()
-    .notEmpty().withMessage("Email is required")
-    .isEmail().withMessage("Please provide a valid email"),
+export const loginSchema = z.object({
+  email: z
+    .string()
+    .email("Please provide a valid email address")
+    .toLowerCase()
+    .trim(),
 
-  body("password")
-    .notEmpty().withMessage("Password is required"),
-];
+  password: z
+    .string()
+    .min(1, "Password is required"),
+});
 
-export const verifyOtpValidator = [
-  body("email")
-    .trim()
-    .notEmpty().withMessage("Email is required")
-    .isEmail().withMessage("Valid email is required"),
+export const verifyOtpSchema = z.object({
+  email: z
+    .string()
+    .email("Valid email is required")
+    .toLowerCase()
+    .trim(),
 
-  body("otp")
-    .notEmpty().withMessage("OTP is required")
-    .isLength({ min: 6, max: 6 })
-    .withMessage("OTP must be 6 digits")
-    .isNumeric().withMessage("OTP must contain only numbers"),
-];
+  otp: z
+    .string()
+    .length(6, "OTP must be exactly 6 digits")
+    .regex(/^\d+$/, "OTP must contain only numbers"),
+});
 
-export const forgotPasswordValidator = [
-  body("email")
-    .trim()
-    .notEmpty().withMessage("Email is required")
-    .isEmail().withMessage("Valid email is required"),
-];
+export const forgotPasswordSchema = z.object({
+  email: z
+    .string()
+    .email("Valid email is required")
+    .toLowerCase()
+    .trim(),
+});
 
-export const resetPasswordValidator = [
-  body("email")
-    .trim()
-    .notEmpty().withMessage("Email is required")
-    .isEmail().withMessage("Valid email is required"),
+export const resetPasswordSchema = z.object({
+  email: z
+    .string()
+    .email("Valid email is required")
+    .toLowerCase()
+    .trim(),
 
-  body("otp")
-    .notEmpty().withMessage("OTP is required")
-    .isLength({ min: 6, max: 6 })
-    .withMessage("OTP must be 6 digits"),
+  otp: z
+    .string()
+    .length(6, "OTP must be exactly 6 digits")
+    .regex(/^\d+$/, "OTP must contain only numbers"),
 
-  body("newPassword")
-    .notEmpty().withMessage("New password is required")
-    .isLength({ min: 8 })
-    .withMessage("Password must be at least 8 characters")
-    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/)
-    .withMessage(
+  newPassword: z
+    .string()
+    .min(8, "Password must be at least 8 characters")
+    .regex(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
       "Password must have uppercase, lowercase and a number"
     ),
-];
+});
+
+export const resendOtpSchema = z.object({
+  email: z
+    .string()
+    .email("Valid email is required")
+    .toLowerCase()
+    .trim(),
+});
+
+// ── Auto generated types from schemas ─────────────────
+export type RegisterInput = z.infer<typeof registerSchema>;
+export type LoginInput = z.infer<typeof loginSchema>;
+export type VerifyOtpInput = z.infer<typeof verifyOtpSchema>;
+export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>;
+export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;

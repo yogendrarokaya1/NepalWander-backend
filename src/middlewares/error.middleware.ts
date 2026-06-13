@@ -24,7 +24,7 @@ export class ConflictError extends AppError {
   constructor(msg = "Conflict") { super(msg, 409); }
 }
 
-// ── Global error handler ──────────────────────────────
+//Global error handler
 export const errorHandler = (
   err: Error,
   _req: Request,
@@ -77,7 +77,7 @@ export const errorHandler = (
   });
 };
 
-// ── 404 handler ───────────────────────────────────────
+//404 handler
 export const notFound = (req: Request, res: Response): void => {
   res.status(404).json({
     success: false,

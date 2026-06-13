@@ -3,50 +3,49 @@ import authController from "../controllers/auth.controller";
 import validate from "../middlewares/validate.middleware";
 import { protect } from "../middlewares/auth.middleware";
 import {
-  registerValidator,
-  loginValidator,
-  verifyOtpValidator,
-  forgotPasswordValidator,
-  resetPasswordValidator,
+  registerSchema,
+  loginSchema,
+  verifyOtpSchema,
+  forgotPasswordSchema,
+  resetPasswordSchema,
+  resendOtpSchema,
 } from "../validators/auth.validator";
 
 const router = Router();
-console.log("✅ Auth routes loaded"); 
 
-// Public
+// Public routes
 router.post(
   "/register",
-  registerValidator,
-  validate,
+  validate(registerSchema),
   authController.register
 );
 router.post(
   "/verify-otp",
-  verifyOtpValidator,
-  validate,
+  validate(verifyOtpSchema),
   authController.verifyOtp
 );
 router.post(
   "/login",
-  loginValidator,
-  validate,
+  validate(loginSchema),
   authController.login
 );
 router.post(
   "/forgot-password",
-  forgotPasswordValidator,
-  validate,
+  validate(forgotPasswordSchema),
   authController.forgotPassword
 );
 router.post(
   "/reset-password",
-  resetPasswordValidator,
-  validate,
+  validate(resetPasswordSchema),
   authController.resetPassword
 );
-router.post("/resend-otp", authController.resendOtp);
+router.post(
+  "/resend-otp",
+  validate(resendOtpSchema),
+  authController.resendOtp
+);
 
-// Protected
+// Protected routes
 router.post("/logout", protect, authController.logout);
 router.get("/me", protect, authController.getMe);
 

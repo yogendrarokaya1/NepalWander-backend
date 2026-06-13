@@ -1,30 +1,37 @@
-import { body } from "express-validator";
+import { z } from "zod";
 
-export const createAdminValidator = [
-  body("firstName")
-    .trim()
-    .notEmpty().withMessage("First name is required")
-    .isLength({ min: 2 })
-    .withMessage("First name must be at least 2 characters"),
+export const createAdminSchema = z.object({
+  firstName: z
+    .string()
+    .min(2, "First name must be at least 2 characters")
+    .trim(),
 
-  body("lastName")
-    .trim()
-    .notEmpty().withMessage("Last name is required")
-    .isLength({ min: 2 })
-    .withMessage("Last name must be at least 2 characters"),
+  lastName: z
+    .string()
+    .min(2, "Last name must be at least 2 characters")
+    .trim(),
 
-  body("email")
-    .trim()
-    .notEmpty().withMessage("Email is required")
-    .isEmail().withMessage("Valid email is required")
-    .normalizeEmail(),
+  email: z
+    .string()
+    .email("Valid email is required")
+    .toLowerCase()
+    .trim(),
 
-  body("password")
-    .notEmpty().withMessage("Password is required")
-    .isLength({ min: 8 })
-    .withMessage("Password must be at least 8 characters")
-    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/)
-    .withMessage(
+  password: z
+    .string()
+    .min(8, "Password must be at least 8 characters")
+    .regex(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
       "Password must have uppercase, lowercase and a number"
     ),
-];
+});
+
+export const rejectAccountSchema = z.object({
+  reason: z
+    .string()
+    .min(10, "Please provide a reason of at least 10 characters")
+    .trim(),
+});
+
+export type CreateAdminInput = z.infer<typeof createAdminSchema>;
+export type RejectAccountInput = z.infer<typeof rejectAccountSchema>;

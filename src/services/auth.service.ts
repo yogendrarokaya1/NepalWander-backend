@@ -6,15 +6,14 @@ import {
 } from "../utils/jwt.util";
 import { generateOtp } from "../utils/otp.util";
 import emailService from "./email.service";
+import { UserRole, AccountStatus } from "../types";
 import {
   RegisterInput,
   LoginInput,
   VerifyOtpInput,
   ForgotPasswordInput,
   ResetPasswordInput,
-  UserRole,
-  AccountStatus,
-} from "../types";
+} from "../validators/auth.validator";
 import {
   BadRequestError,
   ConflictError,
@@ -153,14 +152,12 @@ class AuthService {
       );
     }
 
-    // Mark verified and clear OTP
     await userRepository.update(user._id.toString(), {
       isVerified: true,
       otp: undefined,
       otpExpires: undefined,
     });
 
-    // Guide/Operator needs admin approval — no token yet
     if (
       user.role === UserRole.GUIDE ||
       user.role === UserRole.OPERATOR
@@ -183,7 +180,6 @@ class AuthService {
       };
     }
 
-    // Tourist — issue tokens immediately
     const accessToken = generateAccessToken({
       id: user._id.toString(),
       role: user.role,
@@ -215,7 +211,6 @@ class AuthService {
     };
   }
 
-  // ── LOGIN ─────────────────────────────────────────────
   async login(input: LoginInput) {
     const { email, password } = input;
 
@@ -294,7 +289,6 @@ class AuthService {
     };
   }
 
-  // ── FORGOT PASSWORD ───────────────────────────────────
   async forgotPassword(input: ForgotPasswordInput) {
     const user = await userRepository.findByEmail(input.email);
 
@@ -320,7 +314,6 @@ class AuthService {
     return { message: "Password reset OTP sent to your email." };
   }
 
-  // ── RESET PASSWORD ────────────────────────────────────
   async resetPassword(input: ResetPasswordInput) {
     const { email, otp, newPassword } = input;
 
@@ -348,7 +341,6 @@ class AuthService {
     return { message: "Password reset successfully." };
   }
 
-  // ── RESEND OTP ────────────────────────────────────────
   async resendOtp(email: string) {
     const user = await userRepository.findByEmail(email);
     if (!user) throw new NotFoundError("User not found");
@@ -366,13 +358,11 @@ class AuthService {
     return { message: "New OTP sent to your email." };
   }
 
-  // ── LOGOUT ────────────────────────────────────────────
   async logout(userId: string) {
     await userRepository.clearRefreshToken(userId);
     return { message: "Logged out successfully." };
   }
 
-  // ── GET ME ────────────────────────────────────────────
   async getMe(userId: string) {
     const user = await userRepository.findById(userId);
     if (!user) throw new NotFoundError("User not found");

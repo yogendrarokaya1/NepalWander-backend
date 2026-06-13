@@ -16,7 +16,6 @@ class EmailService {
     });
   }
 
-  // ── Verify Email OTP ────────────────────────────────
   async sendVerificationEmail(
     to: string,
     firstName: string,
@@ -50,7 +49,6 @@ class EmailService {
     });
   }
 
-  // ── Password Reset OTP ──────────────────────────────
   async sendPasswordResetEmail(
     to: string,
     firstName: string,
@@ -81,7 +79,6 @@ class EmailService {
     });
   }
 
-  // ── Admin Welcome Email ─────────────────────────────
   async sendAdminWelcomeEmail(
     to: string,
     firstName: string,
@@ -109,7 +106,7 @@ class EmailService {
             </p>
           </div>
           <p style="color:#D85A30;font-weight:bold">
-            ⚠️ Please change your password after first login.
+            Please change your password after first login.
           </p>
           <p>
             Login at:
@@ -122,7 +119,6 @@ class EmailService {
     });
   }
 
-  // ── Account Approved Email ──────────────────────────
   async sendAccountApprovedEmail(
     to: string,
     firstName: string,
@@ -136,7 +132,7 @@ class EmailService {
         <div style="font-family:sans-serif;max-width:520px;
                     margin:auto;padding:24px">
           <h2 style="color:#1D9E75">
-            Account Approved! 🎉
+            Account Approved! 
           </h2>
           <p>Hi ${firstName}, your <strong>${role}</strong>
              account has been approved by our admin team.</p>
@@ -154,7 +150,6 @@ class EmailService {
     });
   }
 
-  // ── Account Rejected Email ──────────────────────────
   async sendAccountRejectedEmail(
     to: string,
     firstName: string,

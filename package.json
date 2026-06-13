@@ -4,23 +4,27 @@
   "description": "",
   "main": "dist/server.js",
   "scripts": {
-  "dev": "nodemon",
-  "build": "tsc",
-  "start": "node dist/server.js",
-  "seed": "ts-node src/config/seed.ts",
-  "test": "jest --runInBand --forceExit --detectOpenHandles",
-  "test:watch": "jest --watch",
-  "test:coverage": "jest --coverage"
+    "dev": "nodemon",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "seed": "ts-node src/config/seed.ts",
+    "test": "jest --runInBand --forceExit --detectOpenHandles",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
   },
-
   "jest": {
-  "preset": "ts-jest",
-  "testEnvironment": "node",
-  "roots": ["<rootDir>/tests"],
-  "testMatch": ["**/*.test.ts"],
-  "collectCoverageFrom": ["src/**/*.ts"]
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "roots": [
+      "<rootDir>/tests"
+    ],
+    "testMatch": [
+      "**/*.test.ts"
+    ],
+    "collectCoverageFrom": [
+      "src/**/*.ts"
+    ]
   },
-
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -31,12 +35,12 @@
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "express-rate-limit": "^8.5.2",
-    "express-validator": "^7.3.2",
     "helmet": "^8.2.0",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.6.3",
     "morgan": "^1.10.1",
-    "nodemailer": "^8.0.10"
+    "nodemailer": "^8.0.10",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",

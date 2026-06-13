@@ -6,7 +6,10 @@ import {
   restrictTo,
   isSuperAdmin,
 } from "../middlewares/auth.middleware";
-import { createAdminValidator } from "../validators/admin.validator";
+import {
+  createAdminSchema,
+  rejectAccountSchema,
+} from "../validators/admin.validator";
 import { UserRole } from "../types";
 
 const router = Router();
@@ -19,8 +22,7 @@ router.use(restrictTo(UserRole.ADMIN));
 router.post(
   "/create-admin",
   isSuperAdmin,
-  createAdminValidator,
-  validate,
+  validate(createAdminSchema),
   adminController.createAdmin
 );
 router.get(
@@ -48,6 +50,7 @@ router.patch(
 );
 router.patch(
   "/accounts/:id/reject",
+  validate(rejectAccountSchema),
   adminController.rejectAccount
 );
 
