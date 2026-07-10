@@ -11,6 +11,8 @@ import {
   rejectAccountSchema,
 } from "../validators/admin.validator";
 import { UserRole } from "../types";
+import bookingController from "../controllers/booking.controller";
+import guideController from "../controllers/guide.controller";
 
 const router = Router();
 
@@ -52,6 +54,21 @@ router.patch(
   "/accounts/:id/reject",
   validate(rejectAccountSchema),
   adminController.rejectAccount
+);
+
+router.get("/bookings", bookingController.getAllBookings);
+router.patch(
+  "/bookings/:id/status",
+  bookingController.updateStatus
+);
+
+router.patch(
+  "/guides/:id/verify-nma",
+  guideController.verifyNma
+);
+router.patch(
+  "/guides/:id/toggle-status",
+  guideController.toggleStatus
 );
 
 export default router;

@@ -8,7 +8,7 @@ export const ENV = {
   JWT_SECRET: process.env.JWT_SECRET as string,
   JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET as string,
   JWT_ACCESS_EXPIRES: process.env.JWT_ACCESS_EXPIRES || "15m",
-  JWT_REFRESH_EXPIRES: process.env.JWT_REFRESH_EXPIRES || "7d",
+  JWT_REFRESH_EXPIRES: process.env.JWT_REFRESH_EXPIRES || "15d",
   EMAIL_HOST: process.env.EMAIL_HOST as string,
   EMAIL_PORT: Number(process.env.EMAIL_PORT) || 587,
   EMAIL_USER: process.env.EMAIL_USER as string,
