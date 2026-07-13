@@ -130,6 +130,13 @@ class GuideController {
       );
     }
   );
+
+  adminCreateProfile = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
+    const guide = await guideService.adminCreateProfile(req.body);
+    ApiResponse.created(res, "Guide profile created successfully", guide);
+  }
+);
 }
 
 export default new GuideController();

@@ -22,6 +22,16 @@ const costSchema = z.object({
   other: z.number().min(0).default(0),
 });
 
+// ── Boolean field that accepts both boolean and string ─
+const booleanField = z
+  .union([z.boolean(), z.string()])
+  .optional()
+  .transform((val) => {
+    if (val === undefined || val === null) return false;
+    if (typeof val === "boolean") return val;
+    return val === "true";
+  });
+
 export const createPackageSchema = z.object({
   title: z
     .string()
@@ -72,9 +82,11 @@ export const createPackageSchema = z.object({
     .optional()
     .default(PackageStatus.DRAFT),
 
-  isFeatured: z.boolean().optional().default(false),
+  isFeatured: booleanField,
+  isBestSeller: booleanField,
+  coverImage: z.string().optional().default(""),
 
-  isBestSeller: z.boolean().optional().default(false),
+  images: z.array(z.string()).optional().default([]),
 
   ecoScore: z
     .number()
@@ -87,7 +99,9 @@ export const createPackageSchema = z.object({
 export const updatePackageSchema =
   createPackageSchema.partial();
 
-// ── Zod v4 compatible query schema ───────────────────
+// ── Query schema — separate from body schema ──────────
+// isFeatured/isBestSeller here come from URL query params
+// so they're always strings and need different handling
 export const packageQuerySchema = z.object({
   destination: z.string().optional(),
 
@@ -117,12 +131,18 @@ export const packageQuerySchema = z.object({
   isFeatured: z
     .string()
     .optional()
-    .transform((val) => val === "true"),
+    .transform((val) => {
+      if (!val || val === "undefined") return undefined;
+      return val === "true" ? true : undefined;
+    }),
 
   isBestSeller: z
     .string()
     .optional()
-    .transform((val) => val === "true"),
+    .transform((val) => {
+      if (!val || val === "undefined") return undefined;
+      return val === "true" ? true : undefined;
+    }),
 
   page: z
     .string()

@@ -90,6 +90,17 @@ export const resetPasswordSchema = z.object({
     ),
 });
 
+
+
+export const updateProfileSchema = z.object({
+  firstName: z.string().min(2, "First name must be at least 2 characters").trim().optional(),
+  lastName: z.string().min(2, "Last name must be at least 2 characters").trim().optional(),
+  phone: z.string().optional(),
+  nationality: z.string().optional(),
+  profileImage: z.string().optional(),
+});
+
+
 export const resendOtpSchema = z.object({
   email: z
     .string()
@@ -104,3 +115,4 @@ export type LoginInput = z.infer<typeof loginSchema>;
 export type VerifyOtpInput = z.infer<typeof verifyOtpSchema>;
 export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>;
 export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
+export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;

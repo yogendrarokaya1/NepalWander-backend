@@ -84,22 +84,23 @@ class PackageService {
   }
 
   // ── Get All ───────────────────────────────────────────
-  async getAll(query: PackageQuery) {
-    const { page, limit, ...rest } = query;
+ async getAll(query: PackageQuery) {
+  const { page, limit, ...rest } = query;
 
-    const filter = {
-      destination: rest.destination,
-      difficulty: rest.difficulty as DifficultyLevel | undefined,
-      minPrice: rest.minPrice,
-      maxPrice: rest.maxPrice,
-      duration: rest.duration,
-      search: rest.search,
-      isFeatured: rest.isFeatured,
-      isBestSeller: rest.isBestSeller,
-    };
+  const filter: Record<string, unknown> = {
+    destination: rest.destination,
+    difficulty: rest.difficulty as DifficultyLevel | undefined,
+    minPrice: rest.minPrice,
+    maxPrice: rest.maxPrice,
+    duration: rest.duration,
+    search: rest.search,
+  };
 
-    return packageRepository.findAll(filter, page, limit);
-  }
+  if (rest.isFeatured !== undefined) filter.isFeatured = rest.isFeatured;
+  if (rest.isBestSeller !== undefined) filter.isBestSeller = rest.isBestSeller;
+
+  return packageRepository.findAll(filter as any, page, limit);
+}
 
   // ── Get By ID ─────────────────────────────────────────
   async getById(id: string) {

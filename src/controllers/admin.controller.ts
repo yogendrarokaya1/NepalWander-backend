@@ -69,6 +69,15 @@ class AdminController {
     }
   );
 
+
+toggleUserStatus = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
+    const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    const { isActive } = req.body;
+    const result = await adminService.toggleUserStatus(id, isActive);
+    ApiResponse.success(res, result.message, result.user);
+  }
+);
   
   getAllUsers = asyncHandler(
     async (_req: AuthRequest, res: Response) => {

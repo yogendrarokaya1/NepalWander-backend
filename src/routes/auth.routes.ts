@@ -9,6 +9,7 @@ import {
   forgotPasswordSchema,
   resetPasswordSchema,
   resendOtpSchema,
+  updateProfileSchema,
 } from "../validators/auth.validator";
 
 const router = Router();
@@ -49,4 +50,12 @@ router.post(
 router.post("/logout", protect, authController.logout);
 router.get("/me", protect, authController.getMe);
 
+// Add this to auth.routes.ts (after the getMe route)
+
+router.put(
+  "/profile",
+  protect,
+  validate(updateProfileSchema),
+  authController.updateProfile
+);
 export default router;

@@ -1,4 +1,4 @@
-import { DestinationRepository } from "../repositories/destination.repository";
+import { DestinationFilter, DestinationRepository } from "../repositories/destination.repository";
 import {
   CreateDestinationInput,
   UpdateDestinationInput,
@@ -56,17 +56,17 @@ class DestinationService {
 
   // ── Get All ───────────────────────────────────────────
   async getAll(query: DestinationQuery) {
-    const { page, limit, ...rest } = query;
+  const { page, limit, ...rest } = query;
 
-    const filter = {
-      region: rest.region as DestinationRegion | undefined,
-      difficulty: rest.difficulty as DifficultyLevel | undefined,
-      search: rest.search,
-      isFeatured: rest.isFeatured,
-    };
+  const filter: DestinationFilter = {
+    region: rest.region as DestinationRegion | undefined,
+    difficulty: rest.difficulty as DifficultyLevel | undefined,
+    search: rest.search,
+    isFeatured: rest.isFeatured === true ? true : undefined,
+  };
 
-    return destinationRepository.findAll(filter, page, limit);
-  }
+  return destinationRepository.findAll(filter, page, limit);
+}
 
   // ── Get By ID ─────────────────────────────────────────
   async getById(id: string) {

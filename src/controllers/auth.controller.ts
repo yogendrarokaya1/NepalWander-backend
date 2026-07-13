@@ -91,6 +91,14 @@ class AuthController {
   );
 
 
+updateProfile = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
+    const user = await authService.updateProfile(req.user!.id, req.body);
+    ApiResponse.success(res, "Profile updated successfully", user);
+  }
+);
+
+
   getMe = asyncHandler(
     async (req: AuthRequest, res: Response) => {
       const user = await authService.getMe(req.user!.id);

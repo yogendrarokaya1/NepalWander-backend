@@ -6,8 +6,12 @@ import packageRoutes from "./package.routes";
 import bookingRoutes from "./booking.routes";
 import guideRoutes from "./guide.routes";
 import plannerRoutes from "./planner.routes";
+import uploadRoutes from "./upload.routes";
+
 
 const router = Router();
+
+router.use("/upload", uploadRoutes);
 
 router.use("/auth", authRoutes);
 router.use("/admin", adminRoutes);

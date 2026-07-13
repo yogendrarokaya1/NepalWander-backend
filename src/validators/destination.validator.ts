@@ -68,6 +68,10 @@ export const createDestinationSchema = z.object({
   bestFor: z.array(z.string()).optional().default([]),
 
   isFeatured: z.boolean().optional().default(false),
+
+  coverImage: z.string().optional().default(""),
+
+  images: z.array(z.string()).optional().default([]),
 });
 
 export const updateDestinationSchema =
@@ -89,10 +93,15 @@ export const destinationQuerySchema = z.object({
 
   search: z.string().optional(),
 
+
+
   isFeatured: z
-    .string()
-    .optional()
-    .transform((val) => val === "true"),
+  .string()
+  .optional()
+  .transform((val) => {
+    if (!val || val === "undefined") return undefined;
+    return val === "true" ? true : undefined;
+  }),
 
   page: z
     .string()

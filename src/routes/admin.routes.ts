@@ -13,6 +13,7 @@ import {
 import { UserRole } from "../types";
 import bookingController from "../controllers/booking.controller";
 import guideController from "../controllers/guide.controller";
+import { adminCreateGuideProfileSchema } from "../validators/guide.validator";
 
 const router = Router();
 
@@ -69,6 +70,15 @@ router.patch(
 router.patch(
   "/guides/:id/toggle-status",
   guideController.toggleStatus
+);
+
+// Add this line to admin.routes.ts after the existing /users route:
+router.patch("/users/:id/status", adminController.toggleUserStatus);
+
+router.post(
+  "/guides/profile",
+  validate(adminCreateGuideProfileSchema),
+  guideController.adminCreateProfile
 );
 
 export default router;

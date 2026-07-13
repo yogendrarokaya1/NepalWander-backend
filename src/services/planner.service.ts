@@ -220,6 +220,7 @@ class PlannerService {
         recommendedPackage: {
           id: bestMatch._id,
           title: bestMatch.title,
+          slug: bestMatch.slug,   
           duration: bestMatch.duration,
           difficulty: bestMatch.difficulty,
           price: bestMatch.price,

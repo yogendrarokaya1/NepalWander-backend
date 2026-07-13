@@ -58,6 +58,32 @@ class GuideService {
     return guideRepository.create(data);
   }
 
+  async adminCreateProfile(
+  input: CreateGuideProfileInput & { userId: string }
+) {
+  const existing = await guideRepository.findByUserId(input.userId);
+  if (existing) {
+    throw new ConflictError("Guide profile already exists for this user");
+  }
+ 
+  const data: Partial<IGuide> = {
+    user: input.userId as any,
+    bio: input.bio,
+    specialties: input.specialties as GuideSpecialty[],
+    languages: input.languages as GuideLanguage[],
+    experience: input.experience,
+    certifications: input.certifications as ICertification[],
+    nmaCertNumber: input.nmaCertNumber,
+    pricePerDay: input.pricePerDay,
+    regions: input.regions,
+    isNmaVerified: false,
+    isAvailable: true,
+    isActive: true,
+  };
+ 
+  return guideRepository.create(data);
+}
+
   // ── Get All Guides ────────────────────────────────────
   async getAll(query: GuideQuery) {
     const { page, limit, ...filter } = query;
@@ -220,6 +246,8 @@ class GuideService {
       message: `Guide ${updated?.isActive ? "activated" : "deactivated"} successfully`,
     };
   }
+
+  
 }
 
 export default new GuideService();

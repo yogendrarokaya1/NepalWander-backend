@@ -127,6 +127,31 @@ export const guideQuerySchema = z.object({
     .transform((val) => (val ? Number(val) : 10)),
 });
 
+// Add to guide.validator.ts:
+
+export const adminCreateGuideProfileSchema = z.object({
+  userId: z.string().min(1, "User ID is required"),
+  bio: z.string().min(50, "Bio must be at least 50 characters").trim(),
+  specialties: z
+    .array(z.enum(Object.values(GuideSpecialty) as [string, ...string[]]))
+    .min(1, "At least one specialty is required"),
+  languages: z
+    .array(z.enum(Object.values(GuideLanguage) as [string, ...string[]]))
+    .min(1, "At least one language is required"),
+  experience: z.number().min(0),
+  certifications: z.array(z.object({
+    name: z.string().min(2).trim(),
+    issuedBy: z.string().min(2).trim(),
+    issuedYear: z.number().min(1990).max(new Date().getFullYear()),
+    certificateNumber: z.string().trim().optional(),
+  })).optional().default([]),
+  nmaCertNumber: z.string().trim().optional(),
+  pricePerDay: z.number().min(0),
+  regions: z.array(z.string().trim()).min(1, "At least one region is required"),
+});
+
+export type AdminCreateGuideProfileInput = z.infer<typeof adminCreateGuideProfileSchema>;
+
 export type CreateGuideProfileInput = z.infer<typeof createGuideProfileSchema>;
 export type UpdateGuideProfileInput = z.infer<typeof updateGuideProfileSchema>;
 export type AddReviewInput = z.infer<typeof addReviewSchema>;

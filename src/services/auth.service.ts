@@ -358,6 +358,29 @@ class AuthService {
     return { message: "New OTP sent to your email." };
   }
 
+  // Add this method to AuthService class in auth.service.ts
+
+async updateProfile(userId: string, input: {
+  firstName?: string;
+  lastName?: string;
+  phone?: string;
+  nationality?: string;
+  profileImage?: string;
+}) {
+  const user = await userRepository.findById(userId);
+  if (!user) throw new NotFoundError("User not found");
+
+  const updated = await userRepository.update(userId, {
+    ...(input.firstName && { firstName: input.firstName }),
+    ...(input.lastName && { lastName: input.lastName }),
+    ...(input.phone !== undefined && { phone: input.phone }),
+    ...(input.nationality !== undefined && { nationality: input.nationality }),
+    ...(input.profileImage !== undefined && { profileImage: input.profileImage }),
+  });
+
+  return updated;
+}
+
   async logout(userId: string) {
     await userRepository.clearRefreshToken(userId);
     return { message: "Logged out successfully." };

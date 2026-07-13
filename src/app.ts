@@ -25,16 +25,19 @@ app.use(
   })
 );
 
-app.use(
-  rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 100,
-    message: {
-      success: false,
-      message: "Too many requests. Try again after 15 minutes.",
-    },
-  })
-);
+// Rate limiting — disabled in development
+if (ENV.NODE_ENV !== "development") {
+  app.use(
+    rateLimit({
+      windowMs: 15 * 60 * 1000,
+      max: 100,
+      message: {
+        success: false,
+        message: "Too many requests. Try again after 15 minutes.",
+      },
+    })
+  );
+}
 
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
