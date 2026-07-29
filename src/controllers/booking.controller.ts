@@ -127,6 +127,22 @@ class BookingController {
     }
   );
 
+  // PATCH /api/v1/admin/bookings/:id/assign-guide
+  assignGuide = asyncHandler(
+    async (req: AuthRequest, res: Response) => {
+      const id = getParam(req.params.id);
+      const result = await bookingService.assignGuide(
+        id,
+        req.body.guideId
+      );
+      ApiResponse.success(
+        res,
+        result.message,
+        result.booking
+      );
+    }
+  );
+
   // PATCH /api/v1/admin/bookings/:id/status
   updateStatus = asyncHandler(
     async (req: AuthRequest, res: Response) => {

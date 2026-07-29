@@ -6,6 +6,7 @@ import {
 } from "../utils/jwt.util";
 import { generateOtp } from "../utils/otp.util";
 import emailService from "./email.service";
+import { ENV } from "../config/env";
 import { UserRole, AccountStatus } from "../types";
 import {
   RegisterInput,
@@ -21,39 +22,27 @@ import {
   UnauthorizedError,
   ForbiddenError,
 } from "../middlewares/error.middleware";
-import { ENV } from "../config/env";
 
 const userRepository = new UserRepository();
 
-// ── Helper: send email or log OTP in development ──────
+// ── Helper: send OTP email ─────────────────────────────
 const sendEmail = async (
   type: "verification" | "reset" | "resend",
   email: string,
   firstName: string,
   otp: string
 ): Promise<void> => {
-  if (ENV.NODE_ENV === "production") {
-    if (type === "verification" || type === "resend") {
-      await emailService.sendVerificationEmail(
-        email,
-        firstName,
-        otp
-      );
-    } else if (type === "reset") {
-      await emailService.sendPasswordResetEmail(
-        email,
-        firstName,
-        otp
-      );
-    }
-  } else {
-    // Development — print OTP to terminal
-    console.log("\n──────────────────────────────────────");
-    console.log(`📧  To    : ${email}`);
-    console.log(`👤  Name  : ${firstName}`);
-    console.log(`🔑  OTP   : ${otp}`);
-    console.log(`⏱️   Expires in 10 minutes`);
-    console.log("──────────────────────────────────────\n");
+  if (ENV.NODE_ENV !== "production") {
+    console.log(`\n── OTP (${type}) ──`);
+    console.log(`📧 Email : ${email}`);
+    console.log(`🔑 OTP   : ${otp}\n`);
+    return;
+  }
+
+  if (type === "verification" || type === "resend") {
+    await emailService.sendVerificationEmail(email, firstName, otp);
+  } else if (type === "reset") {
+    await emailService.sendPasswordResetEmail(email, firstName, otp);
   }
 };
 
@@ -120,7 +109,6 @@ class AuthService {
       otpExpires,
     });
 
-    // Send OTP email or print to terminal in dev
     await sendEmail("verification", email, firstName, otp);
 
     const message =
@@ -303,7 +291,6 @@ class AuthService {
     const { otp, otpExpires } = generateOtp();
     await userRepository.saveOtp(input.email, otp, otpExpires);
 
-    // Send reset email or print to terminal in dev
     await sendEmail(
       "reset",
       input.email,
@@ -352,7 +339,6 @@ class AuthService {
     const { otp, otpExpires } = generateOtp();
     await userRepository.saveOtp(email, otp, otpExpires);
 
-    // Send OTP email or print to terminal in dev
     await sendEmail("resend", email, user.firstName, otp);
 
     return { message: "New OTP sent to your email." };

@@ -3,6 +3,7 @@ import { BookingRepository } from "../repositories/booking.repository";
 import {
   CreateGuideProfileInput,
   UpdateGuideProfileInput,
+  AdminUpdateGuideProfileInput,
   AddReviewInput,
   GuideQuery,
 } from "../validators/guide.validator";
@@ -83,6 +84,44 @@ class GuideService {
  
   return guideRepository.create(data);
 }
+
+  // ── Admin — Update Guide Profile By Guide ID ──────────
+  async adminUpdateProfile(
+    guideId: string,
+    input: AdminUpdateGuideProfileInput
+  ) {
+    const guide = await guideRepository.findById(guideId);
+    if (!guide) throw new NotFoundError("Guide not found");
+
+    const data: Partial<IGuide> = {
+      ...input,
+      specialties: input.specialties as
+        | GuideSpecialty[]
+        | undefined,
+      languages: input.languages as
+        | GuideLanguage[]
+        | undefined,
+      certifications: input.certifications as
+        | ICertification[]
+        | undefined,
+    };
+
+    return guideRepository.update(guideId, data);
+  }
+
+  // ── Admin — Delete Guide ──────────────────────────────
+  async deleteGuide(guideId: string) {
+    const guide = await guideRepository.findById(guideId);
+    if (!guide) throw new NotFoundError("Guide not found");
+
+    await guideRepository.delete(guideId);
+    return { message: "Guide profile deleted successfully" };
+  }
+
+  // ── Get Top Reviews (site-wide) ───────────────────────
+  async getTopReviews(limit = 6) {
+    return guideRepository.getTopReviews(limit);
+  }
 
   // ── Get All Guides ────────────────────────────────────
   async getAll(query: GuideQuery) {

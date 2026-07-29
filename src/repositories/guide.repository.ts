@@ -157,6 +157,44 @@ export class GuideRepository {
     return guide;
   }
 
+  async getTopReviews(limit = 6): Promise<
+    {
+      guideId: mongoose.Types.ObjectId;
+      rating: number;
+      comment: string;
+      createdAt: Date;
+      authorFirstName: string;
+      authorLastName: string;
+    }[]
+  > {
+    return GuideModel.aggregate([
+      { $match: { isActive: true, "reviews.0": { $exists: true } } },
+      { $unwind: "$reviews" },
+      { $sort: { "reviews.rating": -1, "reviews.createdAt": -1 } },
+      { $limit: limit },
+      {
+        $lookup: {
+          from: "users",
+          localField: "reviews.user",
+          foreignField: "_id",
+          as: "reviewUser",
+        },
+      },
+      { $unwind: "$reviewUser" },
+      {
+        $project: {
+          _id: 0,
+          guideId: "$_id",
+          rating: "$reviews.rating",
+          comment: "$reviews.comment",
+          createdAt: "$reviews.createdAt",
+          authorFirstName: "$reviewUser.firstName",
+          authorLastName: "$reviewUser.lastName",
+        },
+      },
+    ]);
+  }
+
   async delete(id: string): Promise<boolean> {
     if (!mongoose.Types.ObjectId.isValid(id)) return false;
     const result = await GuideModel.findByIdAndDelete(id);

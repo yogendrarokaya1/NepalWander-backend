@@ -43,6 +43,7 @@ export interface IBooking {
   bookingNumber: string;
   user: mongoose.Types.ObjectId;
   package: mongoose.Types.ObjectId;
+  guide?: mongoose.Types.ObjectId;
   travelers: ITraveler[];
   groupSize: number;
   startDate: Date;
@@ -100,6 +101,10 @@ const BookingSchema = new Schema<IBooking>(
       type: Schema.Types.ObjectId,
       ref: "Package",
       required: true,
+    },
+    guide: {
+      type: Schema.Types.ObjectId,
+      ref: "Guide",
     },
     travelers: {
       type: [TravelerSchema],

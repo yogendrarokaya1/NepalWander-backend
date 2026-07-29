@@ -13,7 +13,11 @@ import {
 import { UserRole } from "../types";
 import bookingController from "../controllers/booking.controller";
 import guideController from "../controllers/guide.controller";
-import { adminCreateGuideProfileSchema } from "../validators/guide.validator";
+import {
+  adminCreateGuideProfileSchema,
+  adminUpdateGuideProfileSchema,
+} from "../validators/guide.validator";
+import { assignGuideSchema } from "../validators/booking.validator";
 
 const router = Router();
 
@@ -62,6 +66,11 @@ router.patch(
   "/bookings/:id/status",
   bookingController.updateStatus
 );
+router.patch(
+  "/bookings/:id/assign-guide",
+  validate(assignGuideSchema),
+  bookingController.assignGuide
+);
 
 router.patch(
   "/guides/:id/verify-nma",
@@ -79,6 +88,12 @@ router.post(
   "/guides/profile",
   validate(adminCreateGuideProfileSchema),
   guideController.adminCreateProfile
+);
+
+router.put(
+  "/guides/:id/profile",
+  validate(adminUpdateGuideProfileSchema),
+  guideController.adminUpdateProfile
 );
 
 export default router;

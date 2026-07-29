@@ -16,7 +16,16 @@ const router = Router();
 
 // ── Public routes ─────────────────────────────────────
 router.get("/", guideController.getAll);
+router.get("/reviews/top", guideController.getTopReviews);
 router.get("/:id", guideController.getById);
+
+// ── Admin only ─────────────────────────────────────────
+router.delete(
+  "/:id",
+  protect,
+  restrictTo(UserRole.ADMIN),
+  guideController.deleteGuide
+);
 
 // ── Guide only routes ─────────────────────────────────
 router.post(

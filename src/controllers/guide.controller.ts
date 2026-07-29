@@ -33,6 +33,23 @@ class GuideController {
     }
   );
 
+  // GET /api/v1/guides/reviews/top
+  getTopReviews = asyncHandler(
+    async (req: AuthRequest, res: Response) => {
+      const limit = req.query.limit
+        ? Number(req.query.limit)
+        : 6;
+      const reviews = await guideService.getTopReviews(
+        limit
+      );
+      ApiResponse.success(
+        res,
+        "Top reviews fetched",
+        reviews
+      );
+    }
+  );
+
   // GET /api/v1/guides
   getAll = asyncHandler(
     async (req: AuthRequest, res: Response) => {
@@ -137,6 +154,31 @@ class GuideController {
     ApiResponse.created(res, "Guide profile created successfully", guide);
   }
 );
+
+  // PUT /api/v1/admin/guides/:id/profile
+  adminUpdateProfile = asyncHandler(
+    async (req: AuthRequest, res: Response) => {
+      const id = getParam(req.params.id);
+      const guide = await guideService.adminUpdateProfile(
+        id,
+        req.body
+      );
+      ApiResponse.success(
+        res,
+        "Guide profile updated successfully",
+        guide
+      );
+    }
+  );
+
+  // DELETE /api/v1/guides/:id
+  deleteGuide = asyncHandler(
+    async (req: AuthRequest, res: Response) => {
+      const id = getParam(req.params.id);
+      const result = await guideService.deleteGuide(id);
+      ApiResponse.success(res, result.message);
+    }
+  );
 }
 
 export default new GuideController();

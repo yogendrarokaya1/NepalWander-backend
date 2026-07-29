@@ -152,6 +152,11 @@ export const adminCreateGuideProfileSchema = z.object({
 
 export type AdminCreateGuideProfileInput = z.infer<typeof adminCreateGuideProfileSchema>;
 
+export const adminUpdateGuideProfileSchema =
+  adminCreateGuideProfileSchema.partial().omit({ userId: true });
+
+export type AdminUpdateGuideProfileInput = z.infer<typeof adminUpdateGuideProfileSchema>;
+
 export type CreateGuideProfileInput = z.infer<typeof createGuideProfileSchema>;
 export type UpdateGuideProfileInput = z.infer<typeof updateGuideProfileSchema>;
 export type AddReviewInput = z.infer<typeof addReviewSchema>;

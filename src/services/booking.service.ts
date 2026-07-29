@@ -1,5 +1,6 @@
 import { BookingRepository } from "../repositories/booking.repository";
 import { PackageRepository } from "../repositories/package.repository";
+import { GuideRepository } from "../repositories/guide.repository";
 import {
   CreateBookingInput,
   CancelBookingInput,
@@ -21,6 +22,7 @@ import {
 
 const bookingRepository = new BookingRepository();
 const packageRepository = new PackageRepository();
+const guideRepository = new GuideRepository();
 
 // ── Generate unique booking number ────────────────────
 const generateBookingNumber = (): string => {
@@ -43,6 +45,16 @@ class BookingService {
       input.packageId
     );
     if (!pkg) throw new NotFoundError("Package not found");
+
+    // Guide is optional — validate only if provided
+    if (input.guideId) {
+      const guide = await guideRepository.findById(
+        input.guideId
+      );
+      if (!guide) {
+        throw new NotFoundError("Guide not found");
+      }
+    }
 
     // Check group size limits
     const groupSize = input.travelers.length;
@@ -92,6 +104,9 @@ class BookingService {
       bookingNumber,
       user: userId as any,
       package: input.packageId as any,
+      guide: input.guideId
+        ? (input.guideId as any)
+        : undefined,
       travelers,
       groupSize,
       startDate,
@@ -238,6 +253,29 @@ class BookingService {
       ? { status: status as BookingStatus }
       : {};
     return bookingRepository.findAll(filter, page, limit);
+  }
+
+  // ── Admin — Assign / Unassign Guide ───────────────────
+  async assignGuide(id: string, guideId?: string | null) {
+    const booking = await bookingRepository.findById(id);
+    if (!booking) throw new NotFoundError("Booking not found");
+
+    if (guideId) {
+      const guide = await guideRepository.findById(guideId);
+      if (!guide) throw new NotFoundError("Guide not found");
+    }
+
+    const updated = await bookingRepository.assignGuide(
+      id,
+      guideId || null
+    );
+
+    return {
+      booking: updated,
+      message: guideId
+        ? "Guide assigned to booking"
+        : "Guide unassigned from booking",
+    };
   }
 
   // ── Admin — Update Booking Status ─────────────────────

@@ -31,6 +31,8 @@ export const createBookingSchema = z.object({
     .string()
     .min(1, "Package ID is required"),
 
+  guideId: z.string().trim().optional(),
+
   startDate: z
     .string()
     .min(1, "Start date is required")
@@ -66,6 +68,10 @@ export const updatePaymentSchema = z.object({
   ),
 });
 
+export const assignGuideSchema = z.object({
+  guideId: z.string().trim().optional().nullable(),
+});
+
 export const bookingQuerySchema = z.object({
   status: z.string().optional(),
   page: z
@@ -81,4 +87,5 @@ export const bookingQuerySchema = z.object({
 export type CreateBookingInput = z.infer<typeof createBookingSchema>;
 export type CancelBookingInput = z.infer<typeof cancelBookingSchema>;
 export type UpdatePaymentInput = z.infer<typeof updatePaymentSchema>;
+export type AssignGuideInput = z.infer<typeof assignGuideSchema>;
 export type BookingQuery = z.infer<typeof bookingQuerySchema>;
